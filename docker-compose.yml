@@ -1,23 +1,25 @@
 services:
-  logstash:
-    image: docker.elastic.co/logstash/logstash:8.5.1
-    container_name: logstash
-    volumes:
-      - ./logstash.conf:/usr/share/logstash/pipeline/logstash.conf:ro
-    ports:
-      - "${LOGSTASH_PORT}:5000"
-      - "9600:9600"
-
   loki:
     image: grafana/loki:latest
     container_name: loki
     user: "root"
     ports:
       - "${LOKI_PORT}:3100"
-    command: -config.file=/etc/loki/local-config.yaml
+    command: -config.file=/etc/loki/local-config.yaml -log.level=debug
     volumes:
       - ./loki-config.yml:/etc/loki/local-config.yaml
       - ./loki-data:/var/loki
+
+  fluent-bit:
+    image: fluent/fluent-bit:latest
+    container_name: fluent-bit
+    volumes:
+      - ./fluent-bit.conf:/fluent-bit/etc/fluent-bit.conf
+    ports:
+      - "24224:24224"
+      - "24224:24224/udp"
+    depends_on:
+      - loki  
 
   prometheus:
     image: prom/prometheus:latest
