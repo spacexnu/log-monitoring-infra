@@ -1,0 +1,4 @@
+http.host: "0.0.0.0"
+
+# Desativa o monitoramento do Elasticsearch
+xpack.monitoring.enabled: false
